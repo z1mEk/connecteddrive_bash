@@ -24,7 +24,7 @@ curl \
 ACCESS_TOKEN=$(cat /tmp/header_bmw | grep -e Location | cut -d'=' -f 3 | cut -d'&' -f 1)
 #expires_in=$(cat /tmp/header_bmw | grep -e Location | cut -d'=' -f 5 | cut -d'$' -f 1)
 
-service_url="https://www.bmw-connecteddrive.pl/remoteservices/v1/$VIN/$COMMAND"
+service_url="https://www.bmw-connecteddrive.pl/api/vehicle/remoteservices/v1/$VIN/$COMMAND"
 
 curl \
     -H "Content-Type: application/json" \
