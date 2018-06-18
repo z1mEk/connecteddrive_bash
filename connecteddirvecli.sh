@@ -31,5 +31,4 @@ curl \
     -H "User-agent: $USER_AGENT" \
     -H "Authorization: Bearer $ACCESS_TOKEN" \
     -H "Content-Length: 0" \
-    --dump-header /tmp/bmw_err \
     --request POST $service_url
