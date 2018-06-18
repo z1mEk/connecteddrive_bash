@@ -1,9 +1,17 @@
 #!/bin/sh
 
+case $1 in
+    "climate") COMMAND="RCN" ;;
+    "lock") COMMAND="RDL" ;;
+    "unlock") COMMAND="RDU" ;;
+    "light") COMMAND="RLF" ;;
+    "horn") COMMAND="RHB" ;;
+    *) echo "Command $1 not recognized" ; exit 1 ;;
+esac
+
 USERNAME="username"
 PASSWORD="password"
 VIN="XXXXXXXXXXXXXXXXX"
-COMMAND="RLF" #'climate': 'RCN','lock': 'RDL','unlock': 'RDU','light': 'RLF','horn': 'RHB'
 USER_AGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0"
 CONNECTED_DRIVE_URL="https://www.bmw-connecteddrive.pl"
 
