@@ -12,8 +12,11 @@ esac
 USERNAME="username"
 PASSWORD="password"
 VIN="XXXXXXXXXXXXXXXXX"
+#COMMAND="RLF" #'climate': 'RCN','lock': 'RDL','unlock': 'RDU','light': 'RLF','horn': 'RHB'
 USER_AGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:57.0) Gecko/20100101 Firefox/57.0"
 CONNECTED_DRIVE_URL="https://www.bmw-connecteddrive.pl"
+
+printf "Authorization..."
 
 curl \
     -s \
@@ -32,40 +35,47 @@ curl \
 
 ACCESS_TOKEN=$(cat /tmp/header_bmw | grep -e Location | cut -d'=' -f 3 | cut -d'&' -f 1)
 
+if [ $ACCESS_TOKEN != "" ] ; then
+    echo "OK"
+else
+    echo "FAIL"
+fi
+
 service_url="$CONNECTED_DRIVE_URL/api/vehicle/remoteservices/v1/$VIN/$COMMAND"
 
+printf "Send command ($1)..."
 service_out=$(curl \
-		-s \
-		-H "Content-Type: application/json" \
-		-H "User-agent: $USER_AGENT" \
-		-H "Authorization: Bearer $ACCESS_TOKEN" \
-		-H "Content-Length: 0" \
-		--request POST $service_url)
+                -s \
+                -H "Content-Type: application/json" \
+                -H "User-agent: $USER_AGENT" \
+                -H "Authorization: Bearer $ACCESS_TOKEN" \
+                -H "Content-Length: 0" \
+                --request POST $service_url)
 
 status=$(echo $service_out | grep -oPm1 "(?<=<remoteServiceStatus>)[^<]+")
 get_status_url="$CONNECTED_DRIVE_URL/api/vehicle/remoteservices/v1/$VIN/state/execution"
 
 if [ $status = 'PENDING' ]
 then
-    for i in `seq 1 9`
+    echo "OK"
+    printf "Check status"
+    for i in `seq 1 10`
     do
-	sleep 10
-	
-	status_out=$(curl \
-			-s \
-			-H "Content-Type: application/json" \
-			-H "User-agent: $USER_AGENT" \
-			-H "Authorization: Bearer $ACCESS_TOKEN" \
-			$get_status_url)
-	
-	status=$(echo $status_out | grep -oPm1 "(?<=<remoteServiceStatus>)[^<]+")
+        sleep 10
+        printf "."
+        status_out=$(curl \
+                        -s \
+                        -H "Content-Type: application/json" \
+                        -H "User-agent: $USER_AGENT" \
+                        -H "Authorization: Bearer $ACCESS_TOKEN" \
+                        $get_status_url)
 
-	if [ $status = 'EXECUTED' ]
-	then
-	    echo $status
-	    exit 1
-	fi
+        status=$(echo $status_out | grep -oPm1 "(?<=<remoteServiceStatus>)[^<]+")
+
+        if [ $status = 'EXECUTED' ]
+        then
+            echo $status
+            exit 1
+        fi
     done
 fi
-
-echo 'ERROR'
