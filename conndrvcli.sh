@@ -18,22 +18,22 @@ CONNECTED_DRIVE_URL="https://www.bmw-connecteddrive.pl"
 
 printf "Authorization..."
 
-curl \
-    -s \
-    -H "Content-Type: application/x-www-form-urlencoded" \
-    -H "User-agent: $USER_AGENT" \
-    --request POST https://customer.bmwgroup.com/gcdm/oauth/authenticate \
-    --dump-header /tmp/header_bmw \
-    --data-urlencode "username=$USERNAME" \
-    --data-urlencode "password=$PASSWORD" \
-    --data-urlencode "client_id=dbf0a542-ebd1-4ff0-a9a7-55172fbfce35" \
-    --data-urlencode "redirect_uri=https://www.bmw-connecteddrive.com/app/default/static/external-dispatch.html" \
-    --data-urlencode "response_type=token" \
-    --data-urlencode "scope=authenticate_user fupo" \
-    --data-urlencode "state=eyJtYXJrZXQiOiJkZSIsImxhbmd1YWdlIjoiZGUiLCJkZXN0aW5hdGlvbiI6ImxhbmRpbmdQYWdlIn0" \
-    --data-urlencode "locale=PL-pl"
+auth_header=$(curl \
+            -s \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            -H "User-agent: $USER_AGENT" \
+            --request POST https://customer.bmwgroup.com/gcdm/oauth/authenticate \
+            --dump-header - \
+            --data-urlencode "username=$USERNAME" \
+            --data-urlencode "password=$PASSWORD" \
+            --data-urlencode "client_id=dbf0a542-ebd1-4ff0-a9a7-55172fbfce35" \
+            --data-urlencode "redirect_uri=https://www.bmw-connecteddrive.com/app/default/static/external-dispatch.html" \
+            --data-urlencode "response_type=token" \
+            --data-urlencode "scope=authenticate_user fupo" \
+            --data-urlencode "state=eyJtYXJrZXQiOiJkZSIsImxhbmd1YWdlIjoiZGUiLCJkZXN0aW5hdGlvbiI6ImxhbmRpbmdQYWdlIn0" \
+            --data-urlencode "locale=PL-pl")
 
-ACCESS_TOKEN=$(cat /tmp/header_bmw | grep -e Location | cut -d'=' -f 3 | cut -d'&' -f 1)
+ACCESS_TOKEN=$(echo $auth_header | grep -e Location | cut -d'=' -f 3 | cut -d'&' -f 1)
 
 if [ $ACCESS_TOKEN != "" ] ; then
     echo "OK"
