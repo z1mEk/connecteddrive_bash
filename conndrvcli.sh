@@ -6,6 +6,7 @@ case $1 in
     "unlock") COMMAND="RDU" ;;
     "light") COMMAND="RLF" ;;
     "horn") COMMAND="RHB" ;;
+    "message") COMMAND="MSG" ;;
     *) echo "Command $1 not recognized" ; exit 1 ;;
 esac
 
@@ -39,6 +40,23 @@ if [ $ACCESS_TOKEN != "" ] ; then
     echo "OK"
 else
     echo "FAIL"
+fi
+
+if [ $COMMAND = "MSG" ] ; then
+    message_url="$CONNECTED_DRIVE_URL/api/vehicle/myinfo/v1"
+
+    printf "Send message..."
+    message_body="{\"vins\":[\"$VIN\"],\"message\":\"$1\",\"subject\":\"$2\"}"
+
+    message_out=$(curl \
+                -s \
+                --request POST $message_url \
+                -H "Content-Type: application/json;charset=utf-8" \
+                -H "User-agent: $USER_AGENT" \
+                -H "Authorization: Bearer $ACCESS_TOKEN" \
+                -d $message_body)
+    echo "OK"
+    exit 1
 fi
 
 service_url="$CONNECTED_DRIVE_URL/api/vehicle/remoteservices/v1/$VIN/$COMMAND"
