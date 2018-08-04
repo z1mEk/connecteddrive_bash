@@ -93,7 +93,7 @@ then
         if [ $status = 'EXECUTED' ]
         then
             echo $status
-            exit 1
+            break
         fi
     done
 fi
